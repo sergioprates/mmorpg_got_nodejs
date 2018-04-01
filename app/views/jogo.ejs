@@ -1,0 +1,156 @@
+<!DOCTYPE HTML>
+<html lang="pt-br">
+	<head>
+		<meta charset="UTF-8">
+
+		<title>MMORPG - Game of Thrones</title>
+		
+		<!-- JQuery -->
+		<script src="js/jquery-2.2.1.js"></script>
+
+		<!-- bootstrap - link cdn -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	
+		<!-- incluindo css -->
+		<link href="css/style.css" rel="stylesheet">
+
+	</head>
+
+	<body class="body-jogo">
+
+		<nav class="navbar navbar-default navbar-static-top">
+			<div class="container">
+				<div class="form-group sair">
+					<button onclick="window.location = '/sair'" type="button" class="btn btn-info pull-right">Sair</button>
+				</div>
+			</div>
+		</nav>
+
+	    <div class="container">
+			<% if(msg != undefined && msg.sucesso==0) { %>
+				<div class="alert alert-danger" id="msgErros">
+					<strong><%= msg.msg%></strong>
+				</div>
+				<% } %>
+				<% if(msg != undefined && msg.sucesso==1) { %>
+					<div class="alert alert-info" id="msgSucesso">
+						<strong><%= msg.msg%></strong>
+					</div>
+				<% } %>
+			<div class="row">
+	    		<div class="col-sm-3 casa">
+					<img src="images/casa_<%= img_casa %>.jpg" />
+				</div>
+
+	    		<div class="col-sm-9">
+					<div class="row barra-superior">
+						<div class="col-sm-2"> 
+							<img src="images/habilidades/temor.jpg" title="Temor" alt="Temor" />
+							<span><%= info.temor%></span>
+						</div>
+						
+						<div class="col-sm-2"> 
+							<img src="images/habilidades/sabedoria.jpg" title="Sabedoria" alt="Sabedoria"/>
+							<span><%= info.sabedoria%></span>
+						</div>
+						
+						<div class="col-sm-2"> 
+							<img src="images/habilidades/comercio.jpg" title="Comércio" alt="Comércio"/>
+							<span><%= info.comercio%></span>
+						</div>
+						
+						<div class="col-sm-2"> 
+							<img src="images/habilidades/magia.jpg" title="Magia" alt="Magia"/>
+							<span><%= info.magia%></span>
+						</div>
+					</div>
+				</div>
+	    	</div>
+			
+			<div class="row">
+				<div class="col-sm-3"></div>
+				<div class="col-sm-9">
+					<div id="acoes" class="acoes">
+						Senhor, o que deseja fazer hoje?
+					</div>					
+				</div>
+			</div>
+			
+		</div>	
+		
+		<div class="barra-inferior">
+			<div class="container">
+			
+				<div class="row">
+					<div class="col-sm-1">
+						<img id="btn_suditos" src="images/outros/suditos.jpg" title="Aldeões" alt="Aldeões"/>
+						<span><%= info.suditos%></span>
+					</div>
+					
+					<div class="col-sm-1">
+						<img id="btn_pergaminho" src="images/outros/pergaminho.jpg" title="Pergaminhos" alt="Pergaminhos"/>
+					</div>
+					
+					<div class="col-sm-8"></div>
+					
+					<div class="col-sm-2">
+						<img src="images/outros/moeda.jpg" title="Moeda" alt="Moeda"/>
+						<span><%= info.moeda%></span>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+
+		<script>
+		$(document).ready(function(){
+			$('#btn_suditos').click(function(){
+				$('#msgErros').hide();
+				$('#msgSucesso').hide();
+				$.ajax(
+					{
+						url: '/suditos',
+						method: 'GET',
+						success: function(data){
+							$('#acoes').html(data);
+						}
+					}
+				);
+			});
+
+			$('#btn_pergaminho').click(function(){
+				$('#msgErros').hide();
+				$('#msgSucesso').hide();
+				$.ajax(
+					{
+						url: '/pergaminhos',
+						method: 'GET',
+						success: function(data){
+							if(timer != null){
+								clearTimeout(timer);
+							}
+							cronometro();
+							$('#acoes').html(data);
+						}
+					}
+				);
+			});
+		});
+	var timer = null;
+		function cronometro(){
+			$('.tempo_restante').each(function(index){
+				var segundos =parseInt($(this).html());
+				segundos = segundos-1;
+				
+				if(segundos < 0){
+					window.location.href = '/jogo?msg=Nova ordem executada&sucesso=1';
+				}
+
+				$(this).html(segundos);
+			});
+
+			timer = setTimeout('cronometro()', 1000);
+		}
+		</script>
+	</body>
+</html>
